@@ -13,6 +13,32 @@ function theme_match_content($node) {
   $home_team = node_load($node->nid_Equipo_Local);
   $away_team = node_load($node->nid_Equipo_Visitante);
   
+  //Obtiene la modalidad a la que pertenece el desafío
+  $modalidad = get_modalidad($node->id_Modalidad_Juego_Temporada);
+  
+  //Convertir el estado numérico en texto
+  switch ($node->Estado) {
+    case CREADO:
+      $estado = 'Por Confirmar';
+      break;
+    case PROGRAMADO:
+      $estado = 'Programado';
+      break;
+    case CANCELADO:
+      $estado = 'Cancelado';
+      break;
+    case COMPLETADO:
+      $estado = 'Terminado';
+      break;
+    case CONFLICTO:
+      $estado = 'En conflicto';
+      break;
+    case ELIMINADO:
+      $estado = 'Eliminado';
+      break;
+    case TABLERO:
+      return;
+  }
   $header = array();
   
   //Primera columa del contenido
@@ -61,11 +87,13 @@ function theme_match_content($node) {
   //Segunda columna de contenido
   $content = array();
   $content['2'][] = array('data' => '<span>MatchID: </span>'. $node->nid, 'class' => 'matchid');
-  $content['3'][] = array('data' => '<span>Fecha: </span>'. format_date($node->Fecha_Inicio, 'large', ''), 'class' => 'match_date');
-  $content['4'][] = array('data' => '<span>No. Rondas: </span>'. $node->Numero_Rondas, 'class' => 'match_round');
+  $content['3'][] = array('data' => '<span>Modalidad: </span>'. $modalidad->Nombre, 'class' => 'matchid');
+  $content['4'][] = array('data' => '<span>Fecha: </span>'. format_date($node->Fecha_Inicio, 'large', ''), 'class' => 'match_date');
+  $content['5'][] = array('data' => '<span>No. Rondas: </span>'. $node->Numero_Rondas, 'class' => 'match_round');
+  $content['6'][] = array('data' => '<span>Estado: </span>'. $estado, 'class' => 'match_round');
   
   //Genera un espacio para separar los links
-  $content['5'][] = array('data' => 'Acciones:', 'class' => 'subheader');
+  $content['7'][] = array('data' => 'Acciones:', 'class' => 'subheader');
   
   $actions = '<div class="actions">';
   //Si el desafio está en estado creado y el usuario es capitán del equipo retado despliega un link para aceptar el reto
@@ -78,7 +106,7 @@ function theme_match_content($node) {
     if ($is_capitan && ($node->Fecha_Inicio + 60*30 <= time())) {
       $actions .= l('Reportar Resultado', 'node/'. $node->nid . '/report');
     }
-    if ($is_capitan) {
+    elseif ($is_capitan) {
       $actions .= t('Podrás reportar el resultado de este desafío 30min después de la fecha de inicio programada.');
     }
   }
@@ -87,7 +115,7 @@ function theme_match_content($node) {
     $actions .= l('Enviar Pruebas', 'node/'. $node->nid . '/proof');
   }
   $actions .= '</div>';
-  $content['6'][] = $actions;
+  $content['8'][] = $actions;
   
   $rows['2'][] = array('data' => theme('table', $header, $content), 'class' => 'content_right');
   

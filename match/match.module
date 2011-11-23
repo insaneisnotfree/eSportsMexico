@@ -568,6 +568,15 @@ function match_menu(){
     'type' => MENU_CALLBACK,
     'file' => 'inc/match_reportar.inc',
   );
+  $items['node/%node/cancel'] = array(
+    'title' => t('Cancelar Desafio'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('match_aceptar'),
+    'access callback' => 'match_aceptar_access',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+    'file' => 'inc/match_aceptar.inc',
+  );
   $items['node/%node/proof'] = array(
     'title' => 'Envio de Pruebas',
     'page callback' => 'drupal_get_form',

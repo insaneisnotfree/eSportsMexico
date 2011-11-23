@@ -36,6 +36,19 @@ function modalidad_lista_desafios_conflicto () {
         '#value' => $away_team->nid,
       );
       
+      //Crea un div para poner los datos del desafío
+      $form['desafio'] = array (
+        '#type' => 'fieldset',
+        '#collapsible' => FALSE,
+        '#title' => t('Match Details'),
+        '#attributes' => array ('class' => 'match'),
+      );
+      $form['desafio']['match_id'] = array (
+        '#type' => 'item',
+        '#title' => 'Match Id',
+        '#value' => $reto->nid_Reto,
+      );
+      
       //Crea el div de cada equipo
       $form['home_team'] = array (
         '#type' => 'fieldset',
