@@ -219,7 +219,7 @@ function administrar_equipos() {
 		$row[ 'modalidad' ] = l($modalidad->Nombre, 'taxonomy/term/'. $modalidad->tid);
 		//TODO: Poner un espacio para la plataforma del juego
 		if($user->uid <> $team->uid)
-			$row[ 'acciones' ] = l('Abandonar', 'node/'. $team->nid . '/drop', array('attributes'=>array('class' => 'popups')));
+			$row[ 'acciones' ] = l('Abandonar', 'node/'. $team->nid . '/drop');
 		++$count;
 		$rows[] = $row;
 	}
@@ -238,12 +238,6 @@ function administrar_equipos() {
  * Formulario para confirmar la salida del jugador del equipo
  */
 function team_drop() {
-	//Pasando las variables necesarias para procesar después de confirmar la acción
-	$form[ 'nid_Equipo' ] = array (
-		'#type' => 'value',
-		'#value' => arg( 1 ),  //Agrega a la forma el nid del equipo que obtenemos de la barra de dirección
-	);
-
 	return confirm_form (
 		$form,
 		t( '¿Estas seguro que quieres abandonar este equipo?' ), //message title
@@ -258,36 +252,40 @@ function team_drop() {
  */
 function team_drop_validate($form, $form_state) {
 	global $user;
+	$nid = arg(1);
 	
-	$jugador = db_fetch_object(db_query('SELECT * FROM {eSM_Integrates_Equipo} AS ie
-										INNER JOIN {eSM_Equipo} AS e ON ie.nid_Equipo = e.nid_Equpo
+	$jugador = db_fetch_object(db_query('SELECT ie.Estado FROM {eSM_Integrantes_Equipo} AS ie
 										INNER JOIN {eSM_Jugador} AS j on ie.id_Jugador = j.id_Jugador
-										WHERE j.uid = %d AND e.nid_Equipo = %d',
-										$user->uid, $form_state['values']['nid_Equipo']));
-		
-	if($jugador->Estado <> ACEPTADO)
-		form_set_error('nid_Equipo', t('No perteneces a la plantilla del equipo.'));
+										WHERE j.uid = %d AND ie.nid_Equipo = %d',
+										$user->uid, $nid));
+	
+	if(!($jugador->Estado == ACEPTADO))
+		form_set_error('', 'No perteneces a la plantilla del equipo.');
 }
 /**
  * Función para administrar los equipos del jugador
  */
 function team_drop_submit($form, $form_state) {
 	global $user;
+	$nid = arg(1);
 	
 		//Obtiene los datos del jugador
 		$jugador = db_fetch_object(db_query('SELECT * FROM {eSM_Jugador} AS j
 											INNER JOIN {eSM_Integrantes_Equipo} AS ie ON j.id_Jugador = ie.id_Jugador
 											INNER JOIN {eSM_Equipo} AS e ON e.nid_Equipo = ie.nid_Equipo
 											WHERE e.nid_Equipo = %d AND j.uid = %d',
-											$form_state['values']['nid_Equipo'], $user->uid));
+											$nid, $user->uid));
 		//Actualiza la tabla de integrantes del equipo
-		db_query('UPDATE {eSM_Integrantes_Equipos}
+		db_query('UPDATE {eSM_Integrantes_Equipo}
 						 SET Estado = %d
 						 WHERE nid_Equipo = %d AND id_Jugador = %d',
-						 ABANDONO, $form_state['values']['nid_Equipo'], $jugador->id_Jugador);
+						 ABANDONO, $nid, $jugador->id_Jugador);
 		//Actualiza el estado del jugador
 		db_query('UPDATE {eSM_Jugador}
 						 SET Estado = %d
 						 WHERE id_Jugador = %d',
 						 AGENTE_LIBRE, $jugador->id_Jugador);
+		
+		drupal_set_message('Has abandonado el equipo');
+		drupal_goto('user/'. $user->uid);
 }
