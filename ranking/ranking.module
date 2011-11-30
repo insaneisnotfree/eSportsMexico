@@ -200,7 +200,7 @@ function _ranking_calcula_desafio ($nid_Equipo_Local, $nid_Equipo_Visitante, $ni
 	$diferenciaPuntuacion = $Puntuacion_Local - $Puntuacion_Visitante;
 			
 	if( $diferenciaPuntuacion < 0 ) {		//El Equipo Local es el de Puntuación Inferior
-		$diferenciaPuntuacion *= -1;
+		$diferenciaPuntuacion = $diferenciaPuntuacion * -1;
 		//Calculamos los puntos que gana/pierde el Equipo Local
 		while ($regla = db_fetch_array($puntos_jugador_inferior)) {
 			if ($diferenciaPuntuacion <= $regla['Diferencia_Puntos']) {

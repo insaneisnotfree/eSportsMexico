@@ -134,13 +134,13 @@ function modalidad_lista_desafios_conflicto () {
       //Agrega los botones para decidir ganador
       $form['home_team']['button'] = array(
         '#type' => 'submit',
-        '#value' => t('Award Win to This Team'),
+        '#value' => t('Award Win to '. $home_team->title),
         '#validate' => array('modalidad_match_conflict_validate'),
         '#submit' => array('modalidad_match_conflict_win_home_team'),
       );
       $form['away_team']['button'] = array(
         '#type' => 'submit',
-        '#value' => t('Award Win to This Team'),
+        '#value' => t('Award Win to '. $away_team->title),
         '#validate' => array('modalidad_match_conflict_validate'),
         '#submit' => array('modalidad_match_conflict_win_away_team'),
       );
