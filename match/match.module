@@ -852,7 +852,7 @@ function match_block($op = 'list', $delta = 0, $edit = array()){
           //Desafiar
           if (($content = _match_prepare_desafiar_link()) && ($content <> 'Equipo Incompleto')) {
             $block['subject'] = 'Desafiar';
-            $block['content'] = l('Desafiar', $content, array('attributes'=>array('class' => 'popups')));
+            $block['content'] = l('Desafiar', $content);
           }
 					elseif ($content == 'Equipo Incompleto') {
             $block['subject'] = 'Desafiar';

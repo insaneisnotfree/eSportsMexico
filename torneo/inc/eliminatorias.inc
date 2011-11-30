@@ -31,10 +31,10 @@ function torneo_eliminatorias ($node) {
     for ($table=1; $table<=$count; $table++) {
       $data = array();
 	  if($table == $count) 
-		$data['Titular'] = array('data' => array('<b><span id="final">Ganador</span> <img src="/' . $image_path . 'trophysmall.gif"></b>'), 'class' => 'header');
+		$data['Titular'] = array('data' => array('<b><span id="ganador">Ganador</span> <img src="/' . $image_path . 'trophysmall.gif"></b>'), 'class' => 'header');
         
 	  elseif($table == $count-1)
-		$data['Titular'] = array('data' => array('<b><span style="color:#009933">Finalistas</span></b>'), 'class' => 'header');
+		$data['Titular'] = array('data' => array('<b><span id="final">Finalistas</span></b>'), 'class' => 'header');
         
 	  elseif($table == $count-2)
 		$data['Titular'] = array('data' => array('<b><span id="semi">Semi-Finalistas</span></b>'), 'class' => 'header');
