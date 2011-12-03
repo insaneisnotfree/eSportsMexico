@@ -99,6 +99,7 @@ function theme_match_content($node) {
   //Si el desafio está en estado creado y el usuario es capitán del equipo retado despliega un link para aceptar el reto
   if (($node->Estado == CREADO) && $away_capitan) {
     $actions .= l('Aceptar Desafio', 'node/'. $node->nid . '/accept');
+    $actions .= l('Rechazar Desafio', 'node/'. $node->nid . '/cancel');
   }
   
   //Si el desafio está en estado programado despliega un link para reportar el resultado
