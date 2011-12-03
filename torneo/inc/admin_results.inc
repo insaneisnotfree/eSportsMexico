@@ -169,10 +169,6 @@ function torneo_admin_form($form_state, $node = NULL, $node_type = NULL, $includ
            '#collapsible' => FALSE,
            '#attributes' => array ('class' => 'match_options'),
          );
-         $form['options']['cancel'] = array (
-           '#type' => 'item',
-           '#value' => l('Cancel Match', 'node/'. $reto->nid_Reto .'/cancel'),
-         );  
          if($reto = db_fetch_object($retos)) {
            ++$offset;
            
