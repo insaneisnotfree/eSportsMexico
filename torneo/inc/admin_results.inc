@@ -15,9 +15,14 @@ function torneo_admin_results($node) {
 function torneo_admin_form($form_state, $node = NULL, $node_type = NULL, $include_buttons = FALSE) {
    $settings = get_settings_torneo($node->nid);    //Obtiene las configuraciones del torneo de la tabla si es que el torneo ya existe.
    
+  //Verifica si el usuario ha pedido saltarse algúnos desafíos
+  if (arg(4) == 'skip') {
+    $offset = arg(5);
+  }
+   
   if (module_exists('match')) {
       //Selecciona los partidos que estén en conflicto
-      $retos = _match_torneo_get_match_list($node->nid, PROGRAMADO);
+      $retos = _match_torneo_get_match_list($node->nid, PROGRAMADO, $offset);
       
       $form['Encabezado'] = array(
        '#value' => t('A continuacion se presenta uno por uno los desafios de este torneo.<br/>
@@ -173,7 +178,7 @@ function torneo_admin_form($form_state, $node = NULL, $node_type = NULL, $includ
            
            $form['options']['skip'] = array (
              '#type' => 'item',
-             '#value' => l('Skip Match', 'taxonomy/term/'. $tid .'/match/conflict/skip/'. $offset),
+             '#value' => l('Skip Match', 'node/'. $node->nid .'/admin/match/skip/'. $offset),
            );
          }
      }

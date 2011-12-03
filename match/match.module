@@ -1181,14 +1181,17 @@ function _match_modalidad_get_match_list ($id_Modalidad_Juego_Temporada, $criter
  * @return
  *  mysql object
  */
-function _match_torneo_get_match_list ($nid_Torneo, $criterio) {
-    $query = db_query('SELECT * FROM {eSM_Reto} AS r INNER JOIN {eSM_Inicio_Reto} AS ir ON r.nid_Reto = ir.nid_Reto
+function _match_torneo_get_match_list ($nid_Torneo, $criterio, $offset = NULL) {
+    $query = 'SELECT * FROM {eSM_Reto} AS r INNER JOIN {eSM_Inicio_Reto} AS ir ON r.nid_Reto = ir.nid_Reto
 					  INNER JOIN {eSM_Retos_Torneos} AS rt ON r.nid_Reto = rt.nid_Reto
                       WHERE nid_Torneo = %d AND r.Estado = %d
-					  ORDER BY Ronda ASC',
-                      $nid_Torneo, $criterio);
+					  ORDER BY Ronda ASC';
+  if ($offset)
+	$query .= ' LIMIT '. $offset .', 2';
   
-  return $query;
+    $result = db_query($query, $nid_Torneo, $criterio);
+    
+  return $result;
 }
 /**
  * Función para obtener el resultado de un partido
