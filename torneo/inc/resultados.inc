@@ -3,13 +3,25 @@
  * Función para mostrar la vista de los participantes y equipos registrados en un torneo
  */
 function torneo_resultados () {
+  $op = arg(3);
   //Obtiene el nid_Torneo de la barra de dirección
   $nid_Torneo = arg(1);
   
-  drupal_set_title ('Partidos Finalizados');
-  
-  //Obtiene la lista de retos
-  $retos = _match_torneo_get_match_list($nid_Torneo, COMPLETADO);
+  switch ($op) { 
+    case 'results':
+      $retos = _match_torneo_get_match_list($nid_Torneo, COMPLETADO);
+      drupal_set_title ('Partidos Finalizados');
+      $mensaje = t('No se ha jugado ningun desafio en este torneo todavia.');
+      break;
+    
+    case 'scheduled':
+    default:
+      $op = 'programados';
+      $retos = _match_torneo_get_match_list($nid_Torneo, PROGRAMADO);
+      drupal_set_title ('Partidos Proximos');
+      $mensaje = t('No se han programado los desafios de este torneo todavia.');
+      break;
+  }
   
   $count = 0;
   
@@ -65,7 +77,7 @@ function torneo_resultados () {
   
   if ($count == 0) {
       $form['Mensaje'] = array (
-          '#value' => t('No se han jugado partidos en este torneo.'),
+          '#value' => $mensaje,
       );
   }
   

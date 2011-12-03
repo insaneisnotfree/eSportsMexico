@@ -26,7 +26,6 @@ function team_lista_desafios () {
       $op = 'programados';
       $retos = _match_get_team_match_list($nid_Equipo, PROGRAMADO);
       break;
-    
   }
   
   while( $reto = db_fetch_object( $retos ) ) {
