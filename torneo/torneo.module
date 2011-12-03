@@ -52,7 +52,27 @@ function torneo_menu() {
     'file' => 'inc/eliminatorias.inc',
   );
   if (module_exists('match')) {
-		$items['node/%node/resultados'] = array(
+		$items['node/%node/match'] = array(
+		  'title' => 'Desafios',
+		  'page callback' => 'drupal_get_form',
+		  'page arguments' => array('torneo_resultados'),
+		  'access callback' => '_torneo_menu_access',
+		  'access arguments' => array(1, 'ver torneos'),
+		  'type' => MENU_LOCAL_TASK,
+		  'weight' => -5,
+		  'file' => 'inc/resultados.inc',
+		);
+		$items['node/%node/match/scheduled'] = array(
+		  'title' => 'Proximos',
+		  'page callback' => 'drupal_get_form',
+		  'page arguments' => array('torneo_resultados'),
+		  'access callback' => '_torneo_menu_access',
+		  'access arguments' => array(1, 'ver torneos'),
+		  'type' => MENU_DEFAULT_LOCAL_TASK,
+		  'weight' => -5,
+		  'file' => 'inc/resultados.inc',
+		);
+		$items['node/%node/match/results'] = array(
 		  'title' => 'Resultados',
 		  'page callback' => 'drupal_get_form',
 		  'page arguments' => array('torneo_resultados'),
@@ -89,11 +109,11 @@ function torneo_menu() {
 	'access callback' => '_torneo_menu_access',
     'access arguments' => array(1, 'administrar torneos'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => -5,
+    'weight' => -6,
 	'file' => 'inc/admin_settings.inc',
   );
-  $items['node/%node/admin/resultados'] = array(
-    'title' => 'Administrar Resultados',
+  $items['node/%node/admin/match'] = array(
+    'title' => 'Desafios',
     'page callback' => 'torneo_admin_results',
     'page arguments' => array(1),
 	'access callback' => '_torneo_menu_access',

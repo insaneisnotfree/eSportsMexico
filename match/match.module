@@ -1185,7 +1185,7 @@ function _match_torneo_get_match_list ($nid_Torneo, $criterio) {
     $query = db_query('SELECT * FROM {eSM_Reto} AS r INNER JOIN {eSM_Inicio_Reto} AS ir ON r.nid_Reto = ir.nid_Reto
 					  INNER JOIN {eSM_Retos_Torneos} AS rt ON r.nid_Reto = rt.nid_Reto
                       WHERE nid_Torneo = %d AND r.Estado = %d
-					  ORDER BY Ronda DESC',
+					  ORDER BY Ronda ASC',
                       $nid_Torneo, $criterio);
   
   return $query;

@@ -9,121 +9,208 @@ function torneo_admin_results($node) {
   return drupal_get_form('torneo_admin_form', $node, $node->type, TRUE);
 }
 /**
- * Función para definir la forma de configuración de los torneos
+ * Función para reportar los desafíos de los torneos directamente por los administradores
+ * 
  */
 function torneo_admin_form($form_state, $node = NULL, $node_type = NULL, $include_buttons = FALSE) {
    $settings = get_settings_torneo($node->nid);    //Obtiene las configuraciones del torneo de la tabla si es que el torneo ya existe.
    
-   if (module_exists('match')) {
-     //Selecciona los partidos que estén en conflicto
-     $retos = _match_torneo_get_match_list($node->nid, CONFLICTO);
-     
-     $form['Encabezado'] = array(
-      '#value' => t('A continuacion se presenta una lista de todos los desafios en conflicto de este torneo.<br/>
-                    Para ver las pruebas de cada uno haz click en el link "Detalles" que se encuentra a la derecha de cada partido.<br/>
-                    Para actualizar el estado de un desafio selecciona el equipo ganador de la lista desplegable y haz click en el boton Guardar Cambios.<br/>'),
-     );
-
-    $count = 0;
-    
-    while( $reto = db_fetch_object( $retos ) ) {
-        ++$count;
-        
-        $home_team = node_load($reto->nid_Equipo_Local);
-        $away_team = node_load($reto->nid_Equipo_Visitante);
-  
-        $form[ $count ][ 'Local' ] = array (
-            '#type' => 'item',
-            '#value' => l($home_team->title, 'node/'. $home_team->nid),
-        );
-  
-        $form[ $count ][ 'Visitante' ] = array (
-            '#type' => 'item',
-            '#value' => l($away_team->title, 'node/'. $away_team->nid),
-        );
-        
-        $form[ $count ][ 'Fecha' ] = array (
-            '#type' => 'item',
-            '#value' => format_date($reto->Fecha_Inicio, 'large'),
-        );
-        
-        $form[ $count ][ 'Ronda' ] = array (
-            '#type' => 'item',
-            '#value' => $reto->Ronda,
-        );
-        
-        $form[ $count ][ 'Partido' ] = array (
-            '#type' => 'item',
-            '#value' => l('Detalles', 'node/'. $reto->nid_Reto),
-        );
-        
-        $form[ 'Ganador_'. $count ] = array (
-          '#type' => 'select',
-          '#options' => array(
-            0 => t('Selecciona al equipo ganador'),
-            $home_team->nid => $home_team->title,
-            $away_team->nid => $away_team->title,   
-            ),
-          '#default_value' => 0,
-        );
-        $form[ 'nid_Reto_'. $count ] = array (
-          '#type' => 'hidden',
-          '#value' => $reto->nid_Reto,
-        );
-    }
-    
-    if ($count == 0) {
-        $form['Mensaje'] = array (
-            '#value' => t('No existe ningun partido en conflico para este torneo.'),
-        );
-    }
-    else {
-      $form['Submit'] = array(
-        '#type' => 'submit',
-        '#value' =>  t('Guardar cambios'),
+  if (module_exists('match')) {
+      //Selecciona los partidos que estén en conflicto
+      $retos = _match_torneo_get_match_list($node->nid, PROGRAMADO);
+      
+      $form['Encabezado'] = array(
+       '#value' => t('A continuacion se presenta uno por uno los desafios de este torneo.<br/>
+                     Puedes ver las pruebas y la reputacion de cada uno de los participantes asi como el resultado que han reportado.<br/>
+                     Para actualizar el estado de un desafio selecciona el equipo ganador y haz click en el boton "Award Win".<br/>'),
       );
-    }
-    
-    $form['#theme'] = 'torneo_lista_desafios_conflicto';
-   }
-   else {
-    //Añadir un formulario para indicar manualmente el equipo que va ganando en cada partido.
-   }
-   return $form;
-}
-/**
- * Función para validar los cambios realizados a la configuración del torneo por el usuario
- */
-function torneo_admin_form_validate ($form, $form_state) {
-
-}
-/**
- * Función para guardar los cambios realizados por el usuario en la forma de configuración del torneo
- */
-function torneo_admin_form_submit ($form, $form_state) {
-  $count = 0;
-  
-  //Recorre todos los elementos de la tabla para ver si se han establecido ganadores 
-  foreach($form_state['values'] as $index => $element) {
-    if (substr($index, 0, 7) == 'Ganador') {
-      if ($element != 0) {
-        //Si el elemento ha sido seleccionado hacer los cambios correspondientes
-        $identificador = substr($index, 8, 1);
-        
-        $nid_Reto = $form_state['values']['nid_Reto_'. $identificador];
-        $nid_Ganador = $element;
-        
-        if (module_exists('match')) {
-          _match_end_match($nid_Reto, $nid_Ganador);
-        }
-        
-        ++$count; 
-      }
+    if ($reto = db_fetch_object($retos)) {     
+         //Obtiene los datos de los equipos participantes
+         $home_team = node_load($reto->nid_Equipo_Local);
+         $away_team = node_load($reto->nid_Equipo_Visitante);
+         
+         //Agrega a la forma los valores usados para validar y guardar resultados
+         $form['valores']['nid_Reto'] = array (
+           '#type' => 'hidden',
+           '#value' => $reto->nid_Reto,
+         );
+         $form['valores']['home_team_nid'] = array (
+           '#type' => 'hidden',
+           '#value' => $home_team->nid,
+         );
+         $form['valores']['away_team_nid'] = array (
+           '#type' => 'hidden',
+           '#value' => $away_team->nid,
+         );
+         
+         //Crea un div para poner los datos del desafío
+         $form['desafio'] = array (
+           '#type' => 'fieldset',
+           '#collapsible' => FALSE,
+           '#title' => t('Match Details'),
+           '#attributes' => array ('class' => 'match'),
+         );
+         $form['desafio']['match_id'] = array (
+           '#type' => 'item',
+           '#title' => 'Match Id',
+           '#value' => $reto->nid_Reto,
+         );
+         $form['desafio']['fecha'] = array (
+           '#type' => 'item',
+           '#title' => 'Fecha',
+           '#value' => format_date($reto->Fecha_Inicio, 'custom', 'Y-m-d H:i'),
+         );
+         
+         //Crea el div de cada equipo
+         $form['home_team'] = array (
+           '#type' => 'fieldset',
+           '#collapsible' => FALSE,
+           '#title' => $home_team->title,
+           '#attributes' => array ('class' => 'match_details'),
+         );
+         $form['away_team'] = array (
+           '#type' => 'fieldset',
+           '#collapsible' => FALSE,
+           '#title' => $away_team->title,
+           '#attributes' => array ('class' => 'match_details'),
+         );
+         
+         //Agrega la reputación de cada equipo
+         $form['home_team']['reputation'] = array (
+             '#type' => 'item',
+             '#title' => t('Reputation'),
+             '#value' => _match_display_reputation($home_team->nid),
+         );
+         $form['away_team']['reputation'] = array (
+             '#type' => 'item',
+             '#title' => t('Reputation'),
+             '#value' => _match_display_reputation($away_team->nid),
+         );
+         
+         //Agrega el resultado reportado por cada equipo
+         $reporte_equipo_local = _match_get_team_resultado($reto->nid_Reto, $reto->nid_Equipo_Local);
+         $reporte_equipo_visitante = _match_get_team_resultado($reto->nid_Reto, $reto->nid_Equipo_Visitante);
+         
+         if ($reporte_equipo_local->Resultado == VICTORIA)
+           $resultado_local = t('Won');
+         elseif ($reporte_equipo_local->Resultado == DERROTA)
+           $resultado_local = t('Loss');
+         elseif ($reporte_equipo_local->Resultado == PROTESTA)
+           $resultado_local = t('Protest');
+         else
+           $resultado_local = t('No report was maded.');
+           
+         if ($reporte_equipo_visitante->Resultado == VICTORIA)
+           $resultado_visitante = t('Won');
+         elseif ($reporte_equipo_visitante->Resultado == DERROTA)
+           $resultado_visitante = t('Loss');
+         elseif ($reporte_equipo_visitante->Resultado == PROTESTA)
+           $resultado_visitante = t('Protest');
+         else
+           $resultado_visitante = t('No report was maded.');
+           
+         $form['home_team']['report'] = array(
+           '#type' => 'item',
+           '#title' => t('Report'),
+           '#value' => $resultado_local,
+         );
+         $form['away_team']['report'] = array(
+           '#type' => 'item',
+           '#title' => t('Report'),
+           '#value' => $resultado_visitante,
+         );
+         
+         //Agrega las pruebas aportadas por cada equipo
+         $pruebas = match_get_pruebas($reto->nid_Reto);
+         if($pruebas['Prueba_Jugador_Local'] == '')
+           $pruebas['Prueba_Jugador_Local'] = t('No proof was provided.');
+         else
+           $pruebas['Prueba_Jugador_Local'] = l($pruebas['Prueba_Jugador_Local'], $pruebas['Prueba_Jugador_Local']);
+           
+         if($pruebas['Prueba_Jugador_Visitante'] == '')
+           $pruebas['Prueba_Jugador_Visitante'] = t('No proof was provided.');
+         else
+           $pruebas['Prueba_Jugador_Visitante'] = l($pruebas['Prueba_Jugador_Visitante'], $pruebas['Prueba_Jugador_Visitante']);
+           
+         $form['home_team']['proof'] = array(
+           '#type' => 'item',
+           '#title' => t('Pruebas'),
+           '#value' => $pruebas['Prueba_Jugador_Local'],
+         );
+         $form['away_team']['proof'] = array(
+           '#type' => 'item',
+           '#title' => t('Pruebas'),
+           '#value' => $pruebas['Prueba_Jugador_Visitante'],
+         );
+     
+         //Agrega los botones para decidir ganador
+         $form['home_team']['button'] = array(
+           '#type' => 'submit',
+           '#value' => t('Award Win to '. $home_team->title),
+           '#validate' => array('modalidad_match_conflict_validate'),
+           '#submit' => array('modalidad_match_conflict_win_home_team'),
+         );
+         $form['away_team']['button'] = array(
+           '#type' => 'submit',
+           '#value' => t('Award Win to '. $away_team->title),
+           '#validate' => array('modalidad_match_conflict_validate'),
+           '#submit' => array('modalidad_match_conflict_win_away_team'),
+         );
+         
+         //Mas opciones
+         $form['options'] = array (
+           '#type' => 'fieldset',
+           '#title' => t('More Options'),
+           '#collapsible' => FALSE,
+           '#attributes' => array ('class' => 'match_options'),
+         );
+         $form['options']['cancel'] = array (
+           '#type' => 'item',
+           '#value' => l('Cancel Match', 'node/'. $reto->nid_Reto .'/cancel'),
+         );  
+         if($reto = db_fetch_object($retos)) {
+           ++$offset;
+           
+           $form['options']['skip'] = array (
+             '#type' => 'item',
+             '#value' => l('Skip Match', 'taxonomy/term/'. $tid .'/match/conflict/skip/'. $offset),
+           );
+         }
+     }
+    else {
+      $form['options'] = array (
+        '#type' => 'fieldset',
+        '#title' => t('Desafios'),
+        '#collapsible' => FALSE,
+        '#attributes' => array ('class' => 'match_options'),
+      );
+       $form['options']['Mensaje'] = array (
+        '#type' => 'item',
+        '#value' => t('No existen desafios en este torneo todavia.'),
+       );
     }
   }
   
-  if ($count == 0) 
-    drupal_set_message (t('Debes seleccionar por lo menos un desafio para actualizar el resultado.'), 'error');
-  else
-    drupal_set_message(t('Se han actualizado '. $count .' desafios'));
+  return $form;
+}
+/**
+ * Función para validar que el desafío efectivamente esté todavía en estado de conflicto
+ */
+function torneo_admin_results_validate($form, $form_state) {
+  $reto = db_fetch_object(db_query( 'SELECT Estado FROM {eSM_Reto} WHERE nid_Reto = %d', $form_state['values']['nid_Reto']));
+  
+  if($reto->Estado == COMPLETADO)
+    form_set_error('nid_Reto', t('Este desafio ya ha sido reportado.'));
+}
+/**
+ * Función para dar el triunfo al equipo local
+ */
+function modalidad_match_conflict_win_home_team($form, $form_state) {
+  _match_end_match($form_state['values']['nid_Reto'], $form_state['values']['home_team_nid']);
+}
+/**
+ * Función para dar el triunfo al equipo visitante
+ */
+function modalidad_match_conflict_win_away_team($form, $form_state) {
+  _match_end_match($form_state['values']['nid_Reto'], $form_state['values']['away_team_nid']);
 }
