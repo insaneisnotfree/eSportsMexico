@@ -825,9 +825,9 @@ function team_theme() {
 function _team_get_plantilla($nid_Equipo) {
   //Carga todos los jugadores activos en el equipo.
     $jugadores = db_query ('SELECT * FROM {eSM_Jugador} AS j
-                           INNER JOIN {eSM_Integrantes_Equipo} AS ie ON j.{ id_Jugador } = ie.{ id_Jugador }
-                           INNER JOIN {eSM_Equipo} AS e ON ie.{ nid_Equipo } = e.{ nid_Equipo }
-                           WHERE e.{ nid_Equipo } = %d AND ie.{ Estado } = %d',
+                           INNER JOIN {eSM_Integrantes_Equipo} AS ie ON j.id_Jugador = ie.id_Jugador
+                           INNER JOIN {eSM_Equipo} AS e ON ie.nid_Equipo = e.nid_Equipo
+                           WHERE e.nid_Equipo = %d AND ie.Estado = %d',
                            $nid_Equipo, ACEPTADO);
   
   return $jugadores;
@@ -865,8 +865,8 @@ function _team_get_user_team_modalidad ($uid, $id_Modalidad_Juego_Temporada) {
     $equipo = db_fetch_array(db_query('SELECT e.nid_Equipo FROM {eSM_Equipo} AS e
                                       INNER JOIN {eSM_Integrantes_Equipo} AS ie ON e.nid_Equipo = ie.nid_Equipo
                                       INNER JOIN {eSM_Jugador} AS j ON ie.id_Jugador = j.id_Jugador
-                                      WHERE e.id_Modalidad_Juego_Temporada = %d AND uid = %d',
-                                      $id_Modalidad_Juego_Temporada, $uid));
+                                      WHERE e.id_Modalidad_Juego_Temporada = %d AND uid = %d AND ie.Estado = %d',
+                                      $id_Modalidad_Juego_Temporada, $uid, ACEPTADO));
 	
 	return node_load(array('nid' => $equipo['nid_Equipo']));
 }
