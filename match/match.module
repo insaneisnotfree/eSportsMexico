@@ -495,14 +495,14 @@ function match_menu(){
     'access arguments' => array( 1 ),
     'type' => MENU_LOCAL_TASK,
     'file' => 'inc/match_tablero.inc',
-		'weight' => 0
+	'weight' => 0
   );
   $items[ 'taxonomy/term/%/match/board' ] = array (
     'title' => t('Tablero'),
     'access callback' => 'modalidad_ver_lista_desafios_access',
     'access arguments' => array( 1 ),
     'type' => MENU_DEFAULT_LOCAL_TASK,
-		'weight' => -100,
+		'weight' => 100,
   );
   $items[ 'taxonomy/term/%/match/scheduled' ] = array (
     'title' => t('Proximos'),

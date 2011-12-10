@@ -41,6 +41,7 @@ function torneo_perm() {
 function torneo_menu() {
   $items = array();
   
+  //Pestañas para los nodos de tipo torneo
   $items['node/%node/eliminatorias'] = array(
     'title' => 'Eliminatorias',
     'page callback' => 'torneo_eliminatorias',
@@ -48,7 +49,7 @@ function torneo_menu() {
 	'access callback' => '_torneo_menu_access',
     'access arguments' => array(1, 'ver torneos'),
     'type' => MENU_LOCAL_TASK,
-    //'weight' => 20,
+    'weight' => 2,
     'file' => 'inc/eliminatorias.inc',
   );
   if (module_exists('match')) {
@@ -59,7 +60,7 @@ function torneo_menu() {
 		  'access callback' => '_torneo_menu_access',
 		  'access arguments' => array(1, 'ver torneos'),
 		  'type' => MENU_LOCAL_TASK,
-		  'weight' => -5,
+		  'weight' => 3,
 		  'file' => 'inc/resultados.inc',
 		);
 		$items['node/%node/match/scheduled'] = array(
@@ -90,7 +91,7 @@ function torneo_menu() {
 	'access callback' => '_torneo_menu_access',
     'access arguments' => array(1, 'ver torneos'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => -5,
+    'weight' => 1,
     'file' => 'inc/participantes.inc',
   );
   $items['node/%node/admin'] = array(
@@ -100,7 +101,7 @@ function torneo_menu() {
 	'access callback' => '_torneo_menu_access',
     'access arguments' => array(1, 'administrar torneos', 'administrar resultados'),
     'type' => MENU_LOCAL_TASK,
-    'weight' => -5,
+    'weight' => 4,
   );
   $items['node/%node/admin/settings'] = array(
     'title' => t('Basic Settings'),
@@ -121,6 +122,29 @@ function torneo_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => -5,
 	'file' => 'inc/admin_results.inc',
+  );
+  
+  //Pestaña para el taxonomy term con la vista de los torneos
+  $items['taxonomy/term/%/torneos'] = array(
+    'title' => t('Torneos'),
+	'page callback' => 'torneo_modalidades',
+    'access arguments' => array('ver torneos'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -1,
+	'file' => 'inc/torneos_modalidades.inc',
+  );
+  $items['taxonomy/term/%/torneos/scheduled'] = array(
+    'title' => t('Proximos'),
+    'access arguments' => array('ver torneos'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['taxonomy/term/%/torneos/last'] = array(
+    'title' => t('Pasados'),
+    'page callback' => 'torneo_modalidades',
+    'access arguments' => array('ver torneos'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 90,
+	'file' => 'inc/torneos_modalidades.inc',
   );
   
   return $items;
@@ -197,7 +221,7 @@ function torneo_admin($node) {
  * Implementation of hook_cron().
  *
  * Hay dos tareas básica que se llevan a cabo durante la ejecución de cron
- * Realizar el llenado de los brackets de acuerdo a los equipos inscritos y su posición en el ránking 1 hora antes de empezar los partidos
+ * Realizar el llenado de los brackets de acuerdo a los equipos inscritos y su posición en el ránking
  * Realizar el cierre del torneo 24 horas después de la final para actualizar los puntos y premios de cada uno de los equipos participantes
  * como requieren bastante proceso de datos, cada una de las tareas tiene una función especial para llevarla a cabo
  */

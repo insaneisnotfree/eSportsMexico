@@ -286,7 +286,7 @@ function base_datos_externa_menu( ) {
 	
 	//Define la subpestaña principal
 	$items[ 'taxonomy/term/%/home' ] = array(
-		'title' => t('Ver'),
+		'title' => t('Inicio'),
 		'type' => MENU_DEFAULT_LOCAL_TASK,
 		'weight' => -100,
 	);
@@ -296,6 +296,7 @@ function base_datos_externa_menu( ) {
 		'access arguments'	=> array( 'view comunity' ),
 		'type' => MENU_LOCAL_TASK,
 		'file' => 'inc/taxonomy_term_pages.inc',
+		'weight' => -10,
 	);
 	$items[ 'taxonomy/term/%/rules' ] = array(
     'title' => t('Rules'),

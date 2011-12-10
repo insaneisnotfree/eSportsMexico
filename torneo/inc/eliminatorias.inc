@@ -40,7 +40,7 @@ function torneo_eliminatorias ($node) {
 		$data['Titular'] = array('data' => array('<b><span id="semi">Semi-Finalistas</span></b>'), 'class' => 'header');
         
 	  else
-	    $data['Titular'] = array('data' => array('<b><span style="color:#333333">Ronda '.$table.'</span></b>'), 'class' => 'header');
+	    $data['Titular'] = array('data' => array('<b><span>Ronda '.$table.'</span></b>'), 'class' => 'header');
 	  
 	  $data['Espacio'] = array('data' => array('&nbsp;'));
 	  
