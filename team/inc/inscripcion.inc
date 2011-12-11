@@ -36,7 +36,7 @@ function inscripcion( ) {
   $type = 'team';
   
   // Initialize settings:
-  $node = array('uid' => $user->uid, 'name' => (isset($user->name) ? $user->name : ''), 'type' => $type, 'language' => '');
+  $node = array('uid' => $user->uid, 'name' => (isset($user->name) ? $user->name : ''), 'type' => $type, 'language' => '', 'id_Modalidad_Juego_Temporada' => $modalidad->id_Modalidad_Juego_Temporada);
   
   return drupal_get_form($type .'_node_form', $node);
 }

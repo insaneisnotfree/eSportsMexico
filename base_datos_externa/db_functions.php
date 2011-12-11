@@ -1,20 +1,4 @@
 <?php
-
-/**
- * Función para obtener los datos de una modalidad
- * teniendo como base el id_Modalidad_Juego_Temporada
- * devuelve un objeto con todas las características de una modalidad
- */
-function get_modalidad_juego_temporada( $id_Modalidad_Juego_Temporada ){
-	//dpm( $id_Modalidad_Juego_Temporada );
-	
-	$Modalidad_Juego_Temporada = db_fetch_object(db_query('SELECT * FROM {eSM_Modalidad_Juego} AS mj INNER JOIN {eSM_Modalidad_Juego_Temporada} AS mjt ON mj.{id_Modalidad_Juego} = mjt.{id_Modalidad_Juego}
-														  WHERE mjt.{id_Modalidad_Juego_Temporada} = %d', $id_Modalidad_Juego_Temporada));
-	
-	return is_null ( $Modalidad_Juego_Temporada ) ? NULL : $Modalidad_Juego_Temporada;
-}
-
-
 /**
  *	Función para obtener modalidad a través de la modalidad y la temporada
  *	activas

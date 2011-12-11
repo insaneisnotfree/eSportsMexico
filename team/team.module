@@ -298,11 +298,8 @@ function team_view_free_agentes_list() {
  */
 function team_form(&$node, $form_state) {
 	global $user;
-	$default = '';
-	$tid = arg( 2 );
-
-	//Verifica que la modalidad esté activa
-	if (!($modalidad = term_is_active($tid))) {
+	//Verifica que se haya dado de alta la modalidad a la que pertenece el equipo!
+	if (!isset($node->id_Modalidad_Juego_Temporada)) {
     $form['mensaje'] = array (
       '#value' => t('Esta modalidad no esta activa y no se pueden crear equipos.'),
     );
@@ -311,12 +308,8 @@ function team_form(&$node, $form_state) {
 	
 	$form[ 'id_Modalidad_Juego_Temporada' ] = array (
 	  '#type' => 'hidden',
-	  '#value' => $modalidad->id_Modalidad_Juego_Temporada,
+	  '#value' => $node->id_Modalidad_Juego_Temporada,
 	);
-	
-	$type = node_get_types('type', $node);
-	if( !isset( $node->archive ) )
-	  $node->archive = 0;
 
 	// We need to define form elements for the node's title and body.
 	$form[ 'title' ] = array (
@@ -344,14 +337,17 @@ function team_form(&$node, $form_state) {
 	  '#description' => t('Puedes ingresar la informacion que quieras sobre el equipo, su historia o sus miembros en este espacio.'),
 	);
 	$form[ 'body_filter' ][ 'filter' ] = filter_form( $node->format );
-    
-  //Si estamos en una modalidad individual, sugiere al usuario que el nombre por defecto de su equipo sea su nombre de usuario.
-	if ( ( $modalidad->Maximo_Jugadores == 1 ) && ( !isset( $node->title ) ) ) {
-	  $node->title = $user->name;
-	  $form[ 'title' ][ '#disabled' ] = TRUE;
-      $form[ 'title' ][ '#value' ] = $user->name;
-	}
 	
+  //Si estamos en una modalidad individual, sugiere al usuario que el nombre por defecto de su equipo sea su nombre de usuario.
+  $modalidad = get_modalidad_juego_temporada($node->id_Modalidad_Juego_Temporada);
+	if($modalidad->Maximo_Jugadores == 1) {
+	  if (!isset($node->title))
+      $node->title = $user->name;
+	  
+    if(!(user_access('admin team', $user)))
+    $form[ 'title' ][ '#disabled' ] = TRUE;
+	}
+  
 	return $form;
 }
 /**
