@@ -99,11 +99,11 @@ function match_form( &$node, $form_state ) {
 	//Verifica el estado del desafío y si es posible editarlo 
   if (isset($node->Estado) && !(($node->Estado == CREADO) || ($node->Estado == TABLERO)))
 		//El partido ya está en estado de programado o posterior y no se pueden editar las opciones
-    $mensaje = t('No se pueden editar las opciones de este partido.');
+    $mensaje = t('Este desafío está en estado '. $node->Estado .' y no es posible editarlo.');
 
 	if (!isset($node->id_Modalidad_Juego_Temporada) && is_object($modalidad))
 		$node->id_Modalidad_Juego_Temporada = $modalidad->id_Modalidad_Juego_Temporada;
-	elseif (!(is_object($modalidad)))
+	elseif (!isset($node->id_Modalidad_Juego_Temporada) && !(is_object($modalidad)))
 		$mensaje = t('No se ha asignado una modalidad a este desafio.');
     
 	if (!isset($node->Estado))
@@ -121,15 +121,18 @@ function match_form( &$node, $form_state ) {
 		$mensaje = t('No se ha seleccionado ningun equipo a desafiar.');
 	
 	//Obtenemos los datos del equipo local
-	$Equipo_Local = is_capitan($user->uid, $node->id_Modalidad_Juego_Temporada);
-	if (is_null($Equipo_Local)) {
-		if (($modalidad->Minimo_Jugadores > 1) && (tiene_equipo($user->uid, $node->id_Modalidad_Juego_Temporada) == TIENE_EQUIPO))
-			$mensaje = t('Solo los capitanes de equipo pueden crear desafios.');
-		else
-			$mensaje = t('Necesitas inscribirte al ránking para poder empezar a desafiar.<br/>Para inscribirte al ranking haz click en este link: '. l('Click', 'taxonomy/term/'. $modalidad->tid));
-	}	
-	$node->home_team = $Equipo_Local->nid;
-		
+	if(isset($node->nid_Equipo_Local))
+		$node->home_team = $node->nid_Equipo_Local;
+	else {
+		$Equipo_Local = is_capitan($user->uid, $node->id_Modalidad_Juego_Temporada);
+		if (is_null($Equipo_Local)) {
+			if (($modalidad->Minimo_Jugadores > 1) && (tiene_equipo($user->uid, $node->id_Modalidad_Juego_Temporada) == TIENE_EQUIPO))
+				$mensaje = t('Solo los capitanes de equipo pueden crear desafios.');
+			else
+				$mensaje = t('Necesitas inscribirte al ránking para poder empezar a desafiar.<br/>Para inscribirte al ranking haz click en este link: '. l('Click', 'taxonomy/term/'. $modalidad->tid));
+		}	
+		$node->home_team = $Equipo_Local->nid;
+	}
 	//Determina que se tiene que desplegar en la forma
 	if ($mensaje) {
 		$form['mensaje'] = array(
@@ -598,7 +601,7 @@ function match_menu(){
     'file' => 'inc/match_lista_desafios.inc',
   );
   $items[ 'node/%node/desafios/programados' ] = array (
-    'title' => t('Desafios Programados'),
+    'title' => t('Programados'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array( 'team_lista_desafios' ),
     'access callback' => 'match_ver_lista_desafios_access',
@@ -608,7 +611,7 @@ function match_menu(){
     'weight' => 0,
   );
   $items[ 'node/%node/desafios/confirmar' ] = array (
-    'title' => t('Desafios por Confirmar'),
+    'title' => t('Pendientes'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array( 'team_lista_desafios' ),
     'access callback' => 'match_ver_lista_desafios_access',
@@ -618,7 +621,7 @@ function match_menu(){
     'weight' => 1,
   );
   $items[ 'node/%node/desafios/conflicto' ] = array (
-    'title' => t('Desafios en Conflicto'),
+    'title' => t('En Conflicto'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array( 'team_lista_desafios' ),
     'access callback' => 'match_ver_lista_desafios_access',
@@ -628,7 +631,7 @@ function match_menu(){
     'weight' => 2,
   );
   $items[ 'node/%node/desafios/terminados' ] = array (
-    'title' => t('Desafios Terminados'),
+    'title' => t('Terminados'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array( 'team_lista_desafios' ),
     'access callback' => 'match_ver_lista_desafios_access',
