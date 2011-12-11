@@ -129,7 +129,7 @@ function _torneo_ending_event() {
   while ($torneo = db_fetch_object($result)) {
 	$numero_equipos = torneo_get_total_participantes($torneo->nid_Torneo);
     
-    //Encuentra el número de rondas necesarias
+  //Encuentra el número de rondas necesarias
 	//para realizar el torneo.
     $bracketSize = 2;
     $numrounds = 2;
