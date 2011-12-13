@@ -4,8 +4,8 @@
 * Forma para adquirir características de agente libre en la temporada
 */
 function agente_libre() {
-  $tid = arg( 2 );  //Obtiene el tid de la modalidad de la barra de direcciones
   global $user;
+  $tid = arg( 2 );  //Obtiene el tid de la modalidad de la barra de direcciones
   
   if (!($modalidad = term_is_active($tid))) {
     $form['mensaje'] = array ('#value' => t('Esta modalidad no esta activa en esta temporada.'));
@@ -23,7 +23,7 @@ function agente_libre() {
     return $form;
   }
   
-  $tiene_equipo = tiene_equipo( $user->uid, $modalidad->id_Modalidad_Juego_Temporada );
+  $tiene_equipo = tiene_equipo($user->uid, $modalidad->id_Modalidad_Juego_Temporada);
   if ($tiene_equipo == TIENE_EQUIPO) {
     $form['mensaje'] = array ('#value' => t('Ya perteneces a un equipo de esta modalidad. Para buscar otro equipo primero debes abandonar el equipo al que perteneces actualmente.'));
     return $form;

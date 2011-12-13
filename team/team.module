@@ -182,32 +182,35 @@ function team_menu(){
 	$items [ 'user/%/teams' ] = array (
 		'title' => t('Teams'),
 		'page callback' => 'administrar_equipos',
-    'access callback' => 'team_admin_access',
+        'access callback' => 'team_admin_access',
 		'access arguments' => array(1),
 		'file' => 'inc/invitaciones_jugador.inc',
 		'type' => MENU_LOCAL_TASK,
 	);
 	$items [ 'user/%/teams/active' ] = array (
-		'title' => t('Teams Active'),
-    'access callback' => 'team_admin_access',
+		'title' => t('My Teams'),
+        'access callback' => 'team_admin_access',
 		'access arguments' => array(1),
 		'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => -10,
 	);
 	$items [ 'user/%/teams/invites' ] = array (
-		'title' => t('Teams Invites'),
+		'title' => t('Invites'),
 		'page callback' => 'administrar_invitaciones',
-    'access callback' => 'team_admin_access',
+        'access callback' => 'team_admin_access',
 		'access arguments' => array(1),
 		'file' => 'inc/invitaciones_jugador.inc',
 		'type' => MENU_LOCAL_TASK,
+        'weight' => -9,
 	);
 	$items [ 'user/%/teams/request' ] = array (
-		'title' => t('Teams Request'),
+		'title' => t('Requests'),
 		'page callback' => 'administrar_solicitudes',
-    'access callback' => 'team_admin_access',
+        'access callback' => 'team_admin_access',
 		'access arguments' => array(1),
 		'file' => 'inc/invitaciones_jugador.inc',
 		'type' => MENU_LOCAL_TASK,
+        'weight' => -8,
 	);
   
   //Formulario para solicitar unirse a un equipo
@@ -1119,14 +1122,17 @@ function team_links_get_block() {
   }
   $tid = arg(2);
 
-  if ( is_object( $modalidad = term_is_active( $tid )) ) {
+  if (is_object($modalidad = term_is_active($tid))) {
+    
+    if ($modalidad->Maximo_Jugadores > 1) {
       $content[] = l( t( 'Create Team' ), 'taxonomy/term/'. $tid .'/team/register', array('attributes'=>array('class' => 'create_team')));
-      //$content[] = l( t( 'Create Team' ), 'taxonomy/term/'. $tid .'/team/register', array('attributes'=>array('class' => 'popups create_team')));
-      if ($modalidad->Maximo_Jugadores > 1) {
-        $content[] = l( t( 'Look for Team' ), 'taxonomy/term/'. $tid . '/free_agent/register', array('attributes'=>array('class' => 'popups look_team')));
-      }
-      
-      return theme('menu_tree', theme('item_list', $content));
+      $content[] = l( t( 'Look for Team' ), 'taxonomy/term/'. $tid . '/free_agent/register', array('attributes'=>array('class' => 'popups look_team')));
+    }
+    else {
+      $content[] = l(t( 'Create Team' ), 'taxonomy/term/'. $tid .'/team/register', array('attributes'=>array('class' => 'create_team_alone')));
+    }
+    
+    return theme('menu_tree', theme('item_list', $content));
   }
 }
 /**
