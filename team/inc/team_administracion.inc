@@ -187,18 +187,21 @@ function team_administrar_solicitudes_submit($form, $form_state) {
     if ($form_state['values']['checkboxes'][$jugador] != 0) {
       ++$count;
       
-        db_query('UPDATE {eSM_Integrantes_Equipo }
-                 SET Estado = %d
-                 WHERE nid_Equipo = %d AND id_Jugador = %d',
-                 ACEPTADO, $nid_Equipo, $jugador);
-        //Actualiza el estado de la tabla de jugador
-        db_query ('UPDATE {eSM_Jugador }
-                  SET Estado = %d
-                  WHERE id_Jugador = %d',
-                  TIENE_EQUIPO, $jugador);
+      db_query('UPDATE {eSM_Integrantes_Equipo}
+               SET Estado = %d
+               WHERE nid_Equipo = %d AND id_Jugador = %d',
+               ACEPTADO, $nid_Equipo, $jugador);
+      //Actualiza el estado de la tabla de jugador
+      db_query ('UPDATE {eSM_Jugador}
+                SET Estado = %d
+                WHERE id_Jugador = %d',
+                TIENE_EQUIPO, $jugador);
       
       //Notifica al ususario que ha sido aceptado en el equipo
-      rules_invoke_event('usuario_aceptado', $user, user_load(array('uid' => $jugador->uid)), node_load(array('nid' => $nid_Equipo)));
+      $uid = db_result(db_query('SELECT uid FROM {eSM_Jugador} 
+                                WHERE id_Jugador = %d',
+                                $jugador));
+      rules_invoke_event('usuario_aceptado', $user, user_load(array('uid' => $uid)), node_load(array('nid' => $nid_Equipo)));
     }
   }
 

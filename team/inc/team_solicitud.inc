@@ -87,7 +87,7 @@ function team_solicitud_submit($form, &$form_state) {
 			  $equipo->nid, $jugador->id_Jugador, SOLICITA, $form_state['values']['Mensaje']);
   
   //Notifica al capitán del equipo utilizando el módulo rules para disparar una acción configurable
-  rules_invoke_event('solicitud_usuario', $user, user_load(array('uid' => $team->uid)), $team);
+  rules_invoke_event('solicitud_usuario', $user, user_load(array('uid' => $equipo->uid)), $equipo);
   
   //set a message
   drupal_set_message( '¡Tu solicitud ha sido enviada con éxito!' );
