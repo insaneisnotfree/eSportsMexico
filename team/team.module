@@ -132,7 +132,7 @@ function team_menu(){
     'weight' => 10,
 	);
 	$items['node/%node/roster/active'] = array (
-	  'title' => 'Jugadores Activos',
+	  'title' => 'Activos',
 	  'access callback' => 'team_admin_access',
 	  'access arguments' => array( 1 ),
 	  'type' => MENU_DEFAULT_LOCAL_TASK,
