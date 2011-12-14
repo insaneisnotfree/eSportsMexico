@@ -109,7 +109,7 @@ function aceptar_invitacion_submit ($form, $form_state) {
 				 TIENE_EQUIPO, $jugador->id_Jugador, $equipo->id_Modalidad_Juego_Temporada);
 			
 	//Envía mensaje al capitán del equipo notificando que el usuario a aceptado su invitación
-	rules_invoke_event('invitacion_aceptada', $user, user_load(array('uid' => $equipo->uid)), $equipo->nid);
+	rules_invoke_event('invitacion_aceptada', $user, user_load(array('uid' => $equipo->uid)), $equipo);
 	drupal_set_message( t( 'Te has unido al equipo.') );
 }
 /**
